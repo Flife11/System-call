@@ -133,8 +133,7 @@ void ExceptionHandler(ExceptionType which)
             {
                 length++;
             }
-            synchConsole->Write(buffer, length + 1); //loi o day
-	    synchConsole->Write("\n", 1+1); //in them xuong dong cho no dep
+            synchConsole->Write(buffer, length + 1); 
 
 	    delete[] buffer;
             machine->IncreasePC();

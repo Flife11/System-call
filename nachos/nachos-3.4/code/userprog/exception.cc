@@ -25,7 +25,7 @@
 #include "system.h"
 #include "syscall.h"
 
-#define MAX_BUFFER_LENGTH 254
+#define MAX_BUFFER_LENGTH 255
 
 /*
 Input: - User space address (int)
@@ -133,8 +133,7 @@ void ExceptionHandler(ExceptionType which)
             {
                 length++;
             }
-            synchConsole->Write(buffer, length + 1); //loi o day
-	    synchConsole->Write("\n", 1+1); //in them xuong dong cho no dep c:
+            synchConsole->Write(buffer, length + 1); 
 
 	    delete[] buffer;
             machine->IncreasePC();
