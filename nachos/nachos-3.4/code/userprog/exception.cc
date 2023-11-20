@@ -1,4 +1,4 @@
-// exception.cc
+﻿// exception.cc
 //	Entry point into the Nachos kernel from user programs.
 //	There are two kinds of things that can cause control to
 //	transfer back to here from user code:
@@ -140,7 +140,65 @@ void ExceptionHandler(ExceptionType which)
             
             break;
         }
-        
+        case SC_Open:
+        {
+            // thông số cần có 
+            int address = machine->ReadRegister(4); 
+            int type = machine->ReadRegister(5); 
+            char* filename = User2System(address, 32); 
+
+            // tìm vị trí trống gần nhất trong bảng mô tả file 
+            int offset = -1; // error
+            for (int i = 2; i < 15; i++)
+                if (fileSystem->openf[i] == NULL)
+                {
+                    offset = i;
+                    break;
+                }
+
+            // error handling
+            if (offset != -1)
+            {
+                switch (type)
+                {
+                case 0:
+                case 1:
+                    if (fileSystem->openf[offset] = fileSystem->Open(filename, type))
+                        machine->WriteRegister(2, offset);
+                    break;
+                case 2:
+                    machine->WriteRegister(2, 0);
+                    break;
+                case 3:
+                    machine->WriteRegister(2, 1);
+                    break;
+                default:
+                    break;
+                }
+                delete[] filename;
+                break;
+            }
+            machine->WriteRegister(2, -1); // error 
+            delete[] filename;
+            break;
+        }
+
+        case SC_Close:
+        {
+            int id = machine->ReadRegister(4); 
+            if (id >= 0 && id <= 14) 
+            {
+                if (fileSystem->openf[id])
+                {
+                    delete fileSystem->openf[id]; 
+                    fileSystem->openf[id] = NULL; 
+                    machine->WriteRegister(2, 0);
+                    break;
+                }
+            }
+            machine->WriteRegister(2, -1);
+            break;
+        }
 
         default:
             printf("Unexpected user mode exception %d %d\n", which, type);
