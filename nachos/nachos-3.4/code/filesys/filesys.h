@@ -43,6 +43,7 @@
 				// implementation is available
 class FileSystem {
   public:
+	OpenFile** openf;
     FileSystem(bool format) {}
 
     bool Create(char *name, int initialSize) { 
@@ -67,6 +68,7 @@ class FileSystem {
 #else // FILESYS
 class FileSystem {
   public:
+	OpenFile** openf;
     FileSystem(bool format);		// Initialize the file system.
 					// Must be called *after* "synchDisk" 
 					// has been initialized.
