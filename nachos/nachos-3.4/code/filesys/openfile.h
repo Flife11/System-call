@@ -57,7 +57,7 @@ class OpenFile {
 	
   private:
     int file;
-    int getSeekPosition;
+    int seekPosition;
 };
 
 #else // FILESYS
