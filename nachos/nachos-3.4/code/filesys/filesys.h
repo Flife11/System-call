@@ -43,6 +43,7 @@
 				// implementation is available
 class FileSystem {
   public:
+	OpenFile** openf;
     FileSystem(bool format) {}
 
     bool Create(char *name, int initialSize) { 
@@ -59,6 +60,13 @@ class FileSystem {
 	  if (fileDescriptor == -1) return NULL;
 	  return new OpenFile(fileDescriptor);
       }
+	OpenFile* Open(char *name, int type) {
+		int fileDescriptor = OpenForReadWrite(name, FALSE);
+
+		if (fileDescriptor == -1) return NULL;
+		//index++;
+		return new OpenFile(fileDescriptor, type);
+	}
 
     bool Remove(char *name) { return Unlink(name) == 0; }
 
@@ -67,6 +75,7 @@ class FileSystem {
 #else // FILESYS
 class FileSystem {
   public:
+	OpenFile** openf;
     FileSystem(bool format);		// Initialize the file system.
 					// Must be called *after* "synchDisk" 
 					// has been initialized.
@@ -78,7 +87,8 @@ class FileSystem {
 					// Create a file (UNIX creat)
 
     OpenFile* Open(char *name); 	// Open a file (UNIX open)
-
+	OpenFile* Open(char *name, int type);
+	int FindFreeSlot();
     bool Remove(char *name);  		// Delete a file (UNIX unlink)
 
     void List();			// List all the files in the file system

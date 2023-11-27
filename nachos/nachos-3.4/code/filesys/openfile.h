@@ -28,6 +28,7 @@
 					// See definitions listed under #else
 class OpenFile {
   public:
+	int type;
     OpenFile(int f) { file = f; currentOffset = 0; }	// open the file
     ~OpenFile() { Close(file); }			// close the file
 
@@ -52,10 +53,11 @@ class OpenFile {
 		}
 
     int Length() { Lseek(file, 0, 2); return Tell(file); }
-    
+    int getSeekPosition()  { seekPosition = Tell(file); return seekPosition; }
+	
   private:
     int file;
-    int currentOffset;
+    int getSeekPosition;
 };
 
 #else // FILESYS
@@ -63,6 +65,7 @@ class FileHeader;
 
 class OpenFile {
   public:
+	int type;//kiểu file 
     OpenFile(int sector);		// Open a file whose header is located
 					// at "sector" on the disk
     ~OpenFile();			// Close the file
@@ -85,7 +88,10 @@ class OpenFile {
 					// file (this interface is simpler 
 					// than the UNIX idiom -- lseek to 
 					// end of file, tell, lseek back 
-    
+    int getSeekPosition()  
+	{
+		return seekPosition;
+	}
   private:
     FileHeader *hdr;			// Header for this file 
     int seekPosition;			// Current position within the file

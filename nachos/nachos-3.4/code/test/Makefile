@@ -71,3 +71,15 @@ print.o: print.c
 print: print.o start.o
 	$(LD) $(LDFLAGS) start.o print.o -o print.coff
 	../bin/coff2noff print.coff print
+
+read.o: read.c
+	$(CC) $(CFLAGS) -c write.c
+read: read.o start.o
+	$(LD) $(LDFLAGS) start.o read.o -o read.coff
+	../bin/coff2noff read.coff read
+
+write.o: write.c
+	$(CC) $(CFLAGS) -c write.c
+write: write.o start.o
+	$(LD) $(LDFLAGS) start.o write.o -o write.coff
+	../bin/coff2noff write.coff write
