@@ -89,6 +89,7 @@ void IncreasePC()
     	counter = machine->ReadRegister(NextPCReg); //lưu giá trị thanh ghi tiếp theo vào counter
     	machine->WriteRegister(PCReg, counter); //lưu giá trị counter vào thanh ghi lệnh hiện hiện tại
    	machine->WriteRegister(NextPCReg, counter + 4); //lưu giá trị counter+4 vào thanh ghi lệnh kế tiếp
+
 }
 //----------------------------------------------------------------------
 // ExceptionHandler
