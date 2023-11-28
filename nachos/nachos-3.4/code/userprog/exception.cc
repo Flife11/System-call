@@ -133,7 +133,7 @@ void ExceptionHandler(ExceptionType which)
             {
                 length++;
             }
-            synchConsole->Write(buffer, length + 1); 
+            gSynchConsole->Write(buffer, length + 1); 
 
 	    delete[] buffer;
             machine->IncreasePC();

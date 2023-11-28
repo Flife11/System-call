@@ -121,7 +121,7 @@ void ExceptionHandler(ExceptionType which)
             interrupt->Halt();
             break;
 
-        case SC_Print:
+        case SC_PrintString:
         {
             int Address;
             char *buffer;
