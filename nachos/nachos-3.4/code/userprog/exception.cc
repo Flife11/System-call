@@ -157,9 +157,14 @@ void ExceptionHandler(ExceptionType which)
 	    Address = machine->ReadRegister(4); 
 	    length = machine->ReadRegister(5); 
 
-	    buffer = User2System(Address, length); 
+	    buffer = User2System(Address, length); 	    
 	    gSynchConsole->Read(buffer, length); 
-	    System2User(Address, length, buffer); 
+	    int truelength = 0;
+	    while (buffer[truelength] != '\0')
+            {
+                truelength++;
+            }
+	    System2User(Address, truelength, buffer); 
 	    delete[] buffer; 
 	    IncreasePC(); 
 

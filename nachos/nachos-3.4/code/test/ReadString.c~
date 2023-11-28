@@ -10,7 +10,7 @@ int main() {
 
 	PrintString("Chuoi vua nhap: ");
 	PrintString(buffer);
-	PrintString("\n");	
+	//PrintString("\n");	
 
 
 	Halt();
