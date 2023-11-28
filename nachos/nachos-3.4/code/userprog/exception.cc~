@@ -25,7 +25,7 @@
 #include "system.h"
 #include "syscall.h"
 
-#define MAX_BUFFER_LENGTH 254
+#define MAX_BUFFER_LENGTH 255
 
 /*
 Input: - User space address (int)

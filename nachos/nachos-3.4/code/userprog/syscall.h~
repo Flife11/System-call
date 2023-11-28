@@ -29,7 +29,7 @@
 #define SC_Close	8
 #define SC_Fork		9
 #define SC_Yield	10
-#define SC_Print	11
+#define SC_PrintString	11
 
 #ifndef IN_ASM
 
@@ -127,7 +127,7 @@ void Yield();
 
 /* Print a string to console
  */
-void Print(char buffer[]);		
+void PrintString(char buffer[]);		
 
 #endif /* IN_ASM */
 

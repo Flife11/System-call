@@ -70,4 +70,4 @@ print.o: print.c
 	$(CC) $(CFLAGS) -c print.c
 print: print.o start.o
 	$(LD) $(LDFLAGS) start.o print.o -o print.coff
-	../bin/coff2noff matmult.coff matmult
+	../bin/coff2noff print.coff print

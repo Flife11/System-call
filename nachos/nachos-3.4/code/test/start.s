@@ -130,13 +130,13 @@ Yield:
 	j	$31
 	.end Yield
 
-	.globl Print
-	.ent	Print
-Print:
-	addiu $2, $0, SC_Print
+	.globl PrintString
+	.ent	PrintString
+PrintString:
+	addiu $2, $0, SC_PrintString
 	syscall
 	j	$31
-	.end Print
+	.end PrintString
 
 /* dummy function to keep gcc happy */
         .globl  __main

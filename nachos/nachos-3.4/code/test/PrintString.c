@@ -4,7 +4,7 @@
 
 int main(){
 
-    Print("buffer\n");
+    PrintString("buffer\n");
 
     Halt();
     return 0;

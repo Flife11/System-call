@@ -1,4 +1,4 @@
-﻿// exception.cc
+// exception.cc
 //	Entry point into the Nachos kernel from user programs.
 //	There are two kinds of things that can cause control to
 //	transfer back to here from user code:
@@ -121,7 +121,7 @@ void ExceptionHandler(ExceptionType which)
             interrupt->Halt();
             break;
 
-        case SC_Print:
+        case SC_PrintString:
         {
             int Address;
             char *buffer;
@@ -140,67 +140,7 @@ void ExceptionHandler(ExceptionType which)
             
             break;
         }
-        case SC_Open:
-	{
-	    // thông số cần có 
-	    int address = machine->ReadRegister(4);
-	    int fileType = machine->ReadRegister(5);
-	    char* filename = User2System(address, 32);
-	
-	    // tìm vị trí trống trong bảng mô tả file
-	    int availableIndex = -1; // error
-	    for (int i = 2; i < 10; i++) // 0:stdin, 1:stdout
-	        if (fileSystem->openf[i] == NULL)
-	        {
-	            availableIndex = i;
-	            break;
-	        }
-	
-	    // mở file
-	    if (availableIndex != -1)
-	    {
-	        switch (fileType)
-	        {
-	        case 0:
-	        case 1:
-	            if (fileSystem->openf[availableIndex] = fileSystem->Open(filename, fileType))
-	                machine->WriteRegister(2, availableIndex);
-	            break;
-	        case 2:
-	            machine->WriteRegister(2, 0);
-	            break;
-	        case 3:
-	            machine->WriteRegister(2, 1);
-	            break;
-	        default:
-	            break;
-	        }
-	        delete[] filename;
-	        break;
-	    }
-	    machine->WriteRegister(2, -1); // error 
-	    delete[] filename;
-	    machine->IncreasePC();
-	    break;
-	}
-	
-	case SC_Close:
-	{
-	    int id = machine->ReadRegister(4);
-	    if (id >= 0 && id <= 14)
-	    {
-	        if (fileSystem->openf[id])
-	        {
-	            delete fileSystem->openf[id];
-	            fileSystem->openf[id] = NULL;
-	            machine->WriteRegister(2, 0);
-	            break;
-	        }
-	    }
-	    machine->WriteRegister(2, -1);
-	    machine->IncreasePC();
-	    break;
-	}
+        
 
         default:
             printf("Unexpected user mode exception %d %d\n", which, type);
