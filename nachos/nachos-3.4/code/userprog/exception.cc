@@ -80,13 +80,16 @@ int System2User(int virtAddr, int len, char *buffer)
     return i;
 }
 
+
+// hàm tăng giá trị thanh ghi PC
 void IncreasePC()
 {
-	int tempPC = machine->ReadRegister(PCReg);
-   	machine->WriteRegister(PrevPCReg, tempPC);
-    	tempPC = machine->ReadRegister(NextPCReg);
-    	machine->WriteRegister(PCReg, tempPC);
-   	machine->WriteRegister(NextPCReg, tempPC + 4);
+	int counter = machine->ReadRegister(PCReg); //lưu giá trị thanh ghi lệnh hiện tại vào counter
+   	machine->WriteRegister(PrevPCReg, counter); //lưu giá trị counter vào thanh ghi lệnh trước đó
+    	counter = machine->ReadRegister(NextPCReg); //lưu giá trị thanh ghi tiếp theo vào counter
+    	machine->WriteRegister(PCReg, counter); //lưu giá trị counter vào thanh ghi lệnh hiện hiện tại
+   	machine->WriteRegister(NextPCReg, counter + 4); //lưu giá trị counter+4 vào thanh ghi lệnh kế tiếp
+
 }
 //----------------------------------------------------------------------
 // ExceptionHandler
@@ -132,18 +135,18 @@ void ExceptionHandler(ExceptionType which)
         {
             int Address;
             char *buffer;
-            Address = machine->ReadRegister(4);
-            buffer = User2System(Address, MAX_BUFFER_LENGTH);
+            Address = machine->ReadRegister(4); //đọc địa chỉ bắt đầu của vùng nhớ chứa chuỗi sẽ in
+            buffer = User2System(Address, MAX_BUFFER_LENGTH); //copy chuỗi từ vùng nhớ của userspace sang kernel
             int length;
             length = 0;
-            while (buffer[length] != '\0')
+            while (buffer[length] != '\0') //đếm độ dài thật sự của chuỗi muốn in
             {
                 length++;
             }
-            gSynchConsole->Write(buffer, length + 1); 
+            gSynchConsole->Write(buffer, length + 1);  //in chuỗi ra console
 
-	    delete[] buffer;
-            IncreasePC();
+	    delete[] buffer; //giải phóng vùng nhớ
+            IncreasePC(); //tăng program counter
             
             break;
         }
@@ -154,19 +157,19 @@ void ExceptionHandler(ExceptionType which)
 	    int length;
 	    char* buffer;
 
-	    Address = machine->ReadRegister(4); 
-	    length = machine->ReadRegister(5); 
+	    Address = machine->ReadRegister(4); //lấy địa chỉ vùng nhớ ở userspace sẽ lưu chuỗi ở console
+	    length = machine->ReadRegister(5);  //lấy độ dài tối đa của chuỗi
 
-	    buffer = User2System(Address, length); 	    
-	    gSynchConsole->Read(buffer, length); 
+	    buffer = User2System(Address, length); //copy chuỗi từ userspace sang kernel	    
+	    gSynchConsole->Read(buffer, length); //đọc chuỗi từ userspace với độ dài tối đa
 	    int truelength = 0;
-	    while (buffer[truelength] != '\0')
+	    while (buffer[truelength] != '\0') //đếm độ dài thật sự của chuỗi
             {
                 truelength++;
             }
-	    System2User(Address, truelength, buffer); 
-	    delete[] buffer; 
-	    IncreasePC(); 
+	    System2User(Address, truelength, buffer); //copy chuỗi từ vùng nhớ kernel sang userspace
+	    delete[] buffer;  //giải phóng vùng nhớ
+	    IncreasePC();  //tăng program counter
 
 	    break;
         }
