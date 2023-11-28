@@ -82,11 +82,11 @@ int System2User(int virtAddr, int len, char *buffer)
 
 void IncreasePC()
 {
-	int counter = machine->ReadRegister(PCReg);
-   	machine->WriteRegister(PrevPCReg, counter);
-    	counter = machine->ReadRegister(NextPCReg);
-    	machine->WriteRegister(PCReg, counter);
-   	machine->WriteRegister(NextPCReg, counter + 4);
+	int tempPC = machine->ReadRegister(PCReg);
+   	machine->WriteRegister(PrevPCReg, tempPC);
+    	tempPC = machine->ReadRegister(NextPCReg);
+    	machine->WriteRegister(PCReg, tempPC);
+   	machine->WriteRegister(NextPCReg, tempPC + 4);
 }
 //----------------------------------------------------------------------
 // ExceptionHandler
