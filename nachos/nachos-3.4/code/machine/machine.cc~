@@ -217,14 +217,14 @@ void Machine::WriteRegister(int num, int value)
 //   	Increase the Program Counter (PC) register after each system call.
 //----------------------------------------------------------------------
 
-void Machine::IncreasePC()
-{
-	int tempPC = this->ReadRegister(PCReg);
-    this->WriteRegister(PrevPCReg,tempPC);
+//void Machine::IncreasePC()
+//{
+//	int tempPC = this->ReadRegister(PCReg);
+//    this->WriteRegister(PrevPCReg,tempPC);
 
-    tempPC = this->ReadRegister(NextPCReg);
-    this->WriteRegister(PCReg,tempPC);
+//    tempPC = this->ReadRegister(NextPCReg);
+//    this->WriteRegister(PCReg,tempPC);
 
-    this->WriteRegister(NextPCReg,tempPC + 4);
-}
+//    this->WriteRegister(NextPCReg,tempPC + 4);
+//}
 

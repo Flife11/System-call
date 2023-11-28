@@ -80,6 +80,14 @@ int System2User(int virtAddr, int len, char *buffer)
     return i;
 }
 
+void IncreasePC()
+{
+	int counter = machine->ReadRegister(PCReg);
+   	machine->WriteRegister(PrevPCReg, counter);
+    	counter = machine->ReadRegister(NextPCReg);
+    	machine->WriteRegister(PCReg, counter);
+   	machine->WriteRegister(NextPCReg, counter + 4);
+}
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -102,7 +110,6 @@ int System2User(int virtAddr, int len, char *buffer)
 //	"which" is the kind of exception.  The list of possible exceptions
 //	are in machine.h.
 //----------------------------------------------------------------------
-
 
 
 void ExceptionHandler(ExceptionType which)
@@ -133,12 +140,30 @@ void ExceptionHandler(ExceptionType which)
             {
                 length++;
             }
-            synchConsole->Write(buffer, length + 1); 
+            gSynchConsole->Write(buffer, length + 1); 
 
 	    delete[] buffer;
-            machine->IncreasePC();
+            IncreasePC();
             
             break;
+        }
+
+	case SC_ReadString:
+        {
+            int Address;
+	    int length;
+	    char* buffer;
+
+	    Address = machine->ReadRegister(4); 
+	    length = machine->ReadRegister(5); 
+
+	    buffer = User2System(Address, length); 
+	    gSynchConsole->Read(buffer, length); 
+	    System2User(Address, length, buffer); 
+	    delete[] buffer; 
+	    machine->IncreasePC(); 
+
+	    break;
         }
         
 
