@@ -30,6 +30,7 @@
 #define SC_Fork		9
 #define SC_Yield	10
 #define SC_PrintString	11
+#define SC_ReadString	12
 
 #ifndef IN_ASM
 
@@ -127,7 +128,11 @@ void Yield();
 
 /* Print a string to console
  */
-void PrintString(char buffer[]);		
+void PrintString(char buffer[]);
+
+/* Read a string from console
+*/
+void ReadString (char buffer, int length);		
 
 #endif /* IN_ASM */
 

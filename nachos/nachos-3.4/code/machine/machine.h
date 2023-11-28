@@ -117,7 +117,7 @@ class Machine {
 
     void WriteRegister(int num, int value);
 				// store a value into a CPU register
-	void IncreasePC();	 //increase value of program counter register		
+	//void IncreasePC();	 //increase value of program counter register		
 
 
 // Routines internal to the machine simulation -- DO NOT call these 
