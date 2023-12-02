@@ -268,10 +268,9 @@ void ExceptionHandler(ExceptionType which)
 
             int number = 0;
 
-            int i;
             int pow10 = 1;
             // đọc từ đuôi
-            for (i = length - 1; i >= 0; --i) {
+            for (int i = length - 1; i >= 0; --i) {
                 if ('-' == buffer[i] && i == 0) {
                     // number là số âm
                     number *= -1;
