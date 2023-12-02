@@ -146,6 +146,22 @@ ReadString:
 	j	$31
 	.end ReadString
 
+	.globl PrintChar
+	.ent	PrintChar
+PrintChar:
+	addiu $2, $0, SC_PrintChar
+	syscall
+	j	$31
+	.end PrintChar
+
+	.globl ReadChar
+	.ent	ReadChar
+ReadChar:
+	addiu $2, $0, SC_ReadChar
+	syscall
+	j	$31
+	.end ReadChar
+		
 	.globl PrintInt
 	.ent	PrintInt
 PrintInt :
