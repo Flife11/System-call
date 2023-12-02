@@ -173,6 +173,43 @@ void ExceptionHandler(ExceptionType which)
 
 	    break;
         }
+<<<<<<< HEAD
+
+	case SC_PrintChar:
+	{
+		char ch = (char)machine->ReadRegister(4);
+		gSynchConsole->Write(&ch, 1);
+		IncreasePC();
+		break;
+	}
+
+	case SC_ReadChar:
+	{
+		int maxBytes = 255;
+		char* buffer = new char[255];
+		int numBytes = gSynchConsole->Read(buffer, maxBytes);
+
+		if(numBytes > 1) {
+			printf("Chi duoc nhap duy nhat 1 ky tu!\n");
+			DEBUG('a', "\nERROR: Chi duoc nhap duy nhat 1 ky tu!");
+			machine->WriteRegister(2, 0);
+		}
+		else if(numBytes == 0) {
+			printf("Ky tu rong!\n");
+			DEBUG('a', "\nERROR: Ky tu rong!");
+			machine->WriteRegister(2, 0);
+		}
+		else {
+			char c = buffer[0];
+			machine->WriteRegister(2, c);
+		}
+		delete buffer;
+		IncreasePC();
+		
+		break;		
+	}
+=======
+>>>>>>> b838424c054cac13992dd2ae1f2b26bf9f7e218d
         
 
         default:
