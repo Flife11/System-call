@@ -4,9 +4,14 @@
 
 int main() {
 
-    int a = 123;
+    int a;
+    PrintString("nhap so nguyen: ");
+    a = ReadInt();
+
+    PrintString("so nguyen da nhap: ");
     PrintInt(a);
     PrintString("\n");
+
     Halt();
     return 0;
 }

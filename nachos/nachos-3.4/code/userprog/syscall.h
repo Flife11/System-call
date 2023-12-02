@@ -151,6 +151,9 @@ char ReadChar();
  */
 void PrintInt(int number);
 
+/* Read Int from console
+*/
+int ReadInt();
 
 #endif /* IN_ASM */
 

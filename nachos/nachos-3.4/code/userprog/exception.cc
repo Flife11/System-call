@@ -174,138 +174,124 @@ void ExceptionHandler(ExceptionType which)
 	        break;
         }
 
-	case SC_PrintChar:
-	{
-		char ch = (char)machine->ReadRegister(4);
-		gSynchConsole->Write(&ch, 1);
-		IncreasePC();
-		break;
-	}
+	    case SC_PrintChar:
+	    {
+		    char ch = (char)machine->ReadRegister(4);
+		    gSynchConsole->Write(&ch, 1);
+		    IncreasePC();
+		    break;
+	    }
 
-	case SC_ReadChar:
-	{
-		int maxBytes = 255;
-		char* buffer = new char[255];
-		int numBytes = gSynchConsole->Read(buffer, maxBytes);
+	    case SC_ReadChar:
+	    {
+		    int maxBytes = 255;
+		    char* buffer = new char[255];
+		    int numBytes = gSynchConsole->Read(buffer, maxBytes);
 
-		if(numBytes > 1) {
-			printf("Chi duoc nhap duy nhat 1 ky tu!\n");
-			DEBUG('a', "\nERROR: Chi duoc nhap duy nhat 1 ky tu!");
-			machine->WriteRegister(2, 0);
-		}
-		else if(numBytes == 0) {
-			printf("Ky tu rong!\n");
-			DEBUG('a', "\nERROR: Ky tu rong!");
-			machine->WriteRegister(2, 0);
-		}
-		else {
-			char c = buffer[0];
-			machine->WriteRegister(2, c);
-		}
-		delete buffer;
-		IncreasePC();
+		    if(numBytes > 1) {
+			    printf("Chi duoc nhap duy nhat 1 ky tu!\n");
+			    DEBUG('a', "\nERROR: Chi duoc nhap duy nhat 1 ky tu!");
+			    machine->WriteRegister(2, 0);
+		    }
+		    else if(numBytes == 0) {
+			    printf("Ky tu rong!\n");
+			    DEBUG('a', "\nERROR: Ky tu rong!");
+			    machine->WriteRegister(2, 0);
+		    }
+		    else {
+			    char c = buffer[0];
+			    machine->WriteRegister(2, c);
+		    }
+		    delete buffer;
+		    IncreasePC();
 		
-		break;		
-	}
+		    break;		
+	        }
         
         case SC_PrintInt:
         {
-            //// đọc từ thanh ghi
-            //int number = machine->ReadRegister(4); //đọc địa chỉ bắt đầu của vùng nhớ chứa chuỗi sẽ in
-            //char* buffer = NULL;
-            //
-            //
-            //// length
-            //int length = 0;
-            //int temp = number;
-            //do {
-            //    temp /= 10;
-            //    length++;
-            //} while (temp > 0);
+            // đọc từ thanh ghi
+            int number = machine->ReadRegister(4); //đọc địa chỉ bắt đầu của vùng nhớ chứa chuỗi sẽ in
+            char* buffer = NULL;
+            
+            // check negative
+            bool isNegative = false;
+            if (number < 0)
+                isNegative = true;
 
-
-            //// fix negative
-            //int end = 0;
-            //if (number > 0)
-            //{
-            //    number *= -1;
-            //    buffer = new char[length + 1];
-            //}
-            //else
-            //{
-            //    buffer = new char[length + 1 + 1];
-            //    buffer[0] = '-';
-            //    end = 1;
-            //}
-
-
-            //// chuyển số thành chuỗi
-            //temp = number;
-            //int i = length - 1;
-            //do {
-            //    int digit = temp % 10;
-            //    temp /= 10;
-            //    buffer[i] = (digit + '0');
-            //    --i;
-            //} while (i >= end && temp > 0);
-            //buffer[length] = '\0';
-
-
-            int number = machine->ReadRegister(4);;
+            // lấy trị tuyệt đối
+            if (isNegative == true)
+                number *= -1;
+            
+            // length
             int length = 0;
-
-            if (0 == number) {
-                length = 1;
-                gSynchConsole->Write("0", 1);
-            }
-            bool isNegative = (number < 0 ? true : false);
-            if (isNegative) number *= -1;
-
-            //get length of number
-            length = 0;
-            int temp_number = number;
+            int temp = number;
             do {
-                temp_number /= 10;
-                ++length;
-            } while (temp_number > 0);
+                temp /= 10;
+                length++;
+            } while (temp > 0);
 
-            length += (isNegative ? 1 : 0);
-
-            //+1 for null-terminated, +1 for sure
-            char* buffer = new char[length + 1 + 1];
-
-            //cannot allocated because of something => error
-            if (!buffer) break;
-
-            //add '-' if number is negative
+            // fix length
+            int head = 0;
             if (isNegative)
             {
-                buffer[0] = '-';
+                length++; // chừa chỗ cho "-"
+                head = 1; // head[0] = "-"
             }
 
-            //reuse temp_number as copy of number
-            temp_number = number;
+            // chuyển số thành chuỗi
+            buffer = new char[length + 1];
+            buffer[length] = '\0';
+            temp = number;
+            for (int i = length - 1; i >= head; i--)
+            {
+                buffer[i] = (temp % 10 + '0');
+                temp /= 10;
+            }
 
-            //iterator
-            int i = length - 1;
-
-            //Get absolute value
-            do {
-                int digit = temp_number % 10;
-                temp_number /= 10;
-                buffer[i] = (digit + '0');
-                --i;
-            } while (i >= 0 && temp_number > 0);
-
-            //add null-terminated
-            buffer[length] = NULL;
-
+            // fix string
+            if (isNegative)
+                buffer[0] = '-';
 
             // in chuỗi 
-            gSynchConsole->Write(buffer, length + 1);  
+            gSynchConsole->Write(buffer, length);  
 
             delete[] buffer; //giải phóng vùng nhớ
             IncreasePC(); //tăng program counter
+            break;
+        }
+
+        case SC_ReadInt:
+        {
+            char* buffer = new char[MAX_BUFFER_LENGTH + 1];
+            int length = gSynchConsole->Read(buffer, MAX_BUFFER_LENGTH);
+
+            int number = 0;
+
+            int i;
+            int pow10 = 1;
+            // đọc từ đuôi
+            for (i = length - 1; i >= 0; --i) {
+                if ('-' == buffer[i] && i == 0) {
+                    // number là số âm
+                    number *= -1;
+                    break;
+                }
+                else if ('0' <= buffer[i] && buffer[i] <= '9') {
+                    // tạo number
+                    number += (pow10 * (buffer[i] - '0'));
+                    pow10 *= 10;
+                }
+                else {
+                    // number lỗi = 0
+                    number = 0;
+                    break;
+                }
+            }
+
+            machine->WriteRegister(2, number);
+            delete[] buffer;
+            IncreasePC();
             break;
         }
 
