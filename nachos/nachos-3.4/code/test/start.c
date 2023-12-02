@@ -146,6 +146,7 @@ ReadString:
 	j	$31
 	.end ReadString
 
+<<<<<<< HEAD
 	.globl PrintChar
 	.ent	PrintChar
 PrintChar:
@@ -161,6 +162,8 @@ ReadChar:
 	syscall
 	j	$31
 	.end ReadChar
+=======
+>>>>>>> b838424c054cac13992dd2ae1f2b26bf9f7e218d
 
 /* dummy function to keep gcc happy */
         .globl  __main

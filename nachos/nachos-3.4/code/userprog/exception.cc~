@@ -80,16 +80,13 @@ int System2User(int virtAddr, int len, char *buffer)
     return i;
 }
 
-
-// hàm tăng giá trị thanh ghi PC
 void IncreasePC()
 {
-	int counter = machine->ReadRegister(PCReg); //lưu giá trị thanh ghi lệnh hiện tại vào counter
-   	machine->WriteRegister(PrevPCReg, counter); //lưu giá trị counter vào thanh ghi lệnh trước đó
-    	counter = machine->ReadRegister(NextPCReg); //lưu giá trị thanh ghi tiếp theo vào counter
-    	machine->WriteRegister(PCReg, counter); //lưu giá trị counter vào thanh ghi lệnh hiện hiện tại
-   	machine->WriteRegister(NextPCReg, counter + 4); //lưu giá trị counter+4 vào thanh ghi lệnh kế tiếp
-
+	int counter = machine->ReadRegister(PCReg);
+   	machine->WriteRegister(PrevPCReg, counter);
+    	counter = machine->ReadRegister(NextPCReg);
+    	machine->WriteRegister(PCReg, counter);
+   	machine->WriteRegister(NextPCReg, counter + 4);
 }
 //----------------------------------------------------------------------
 // ExceptionHandler
@@ -135,18 +132,18 @@ void ExceptionHandler(ExceptionType which)
         {
             int Address;
             char *buffer;
-            Address = machine->ReadRegister(4); //đọc địa chỉ bắt đầu của vùng nhớ chứa chuỗi sẽ in
-            buffer = User2System(Address, MAX_BUFFER_LENGTH); //copy chuỗi từ vùng nhớ của userspace sang kernel
+            Address = machine->ReadRegister(4);
+            buffer = User2System(Address, MAX_BUFFER_LENGTH);
             int length;
             length = 0;
-            while (buffer[length] != '\0') //đếm độ dài thật sự của chuỗi muốn in
+            while (buffer[length] != '\0')
             {
                 length++;
             }
-            gSynchConsole->Write(buffer, length + 1);  //in chuỗi ra console
+            gSynchConsole->Write(buffer, length + 1); 
 
-	    delete[] buffer; //giải phóng vùng nhớ
-            IncreasePC(); //tăng program counter
+	    delete[] buffer;
+            IncreasePC();
             
             break;
         }
@@ -157,59 +154,22 @@ void ExceptionHandler(ExceptionType which)
 	    int length;
 	    char* buffer;
 
-	    Address = machine->ReadRegister(4); //lấy địa chỉ vùng nhớ ở userspace sẽ lưu chuỗi ở console
-	    length = machine->ReadRegister(5);  //lấy độ dài tối đa của chuỗi
+	    Address = machine->ReadRegister(4); 
+	    length = machine->ReadRegister(5); 
 
-	    buffer = User2System(Address, length); //copy chuỗi từ userspace sang kernel	    
-	    gSynchConsole->Read(buffer, length); //đọc chuỗi từ userspace với độ dài tối đa
+	    buffer = User2System(Address, length); 	    
+	    gSynchConsole->Read(buffer, length); 
 	    int truelength = 0;
-	    while (buffer[truelength] != '\0') //đếm độ dài thật sự của chuỗi
+	    while (buffer[truelength] != '\0')
             {
                 truelength++;
             }
-	    System2User(Address, truelength, buffer); //copy chuỗi từ vùng nhớ kernel sang userspace
-	    delete[] buffer;  //giải phóng vùng nhớ
-	    IncreasePC();  //tăng program counter
+	    System2User(Address, truelength, buffer); 
+	    delete[] buffer; 
+	    IncreasePC(); 
 
 	    break;
         }
-<<<<<<< HEAD
-
-	case SC_PrintChar:
-	{
-		char ch = (char)machine->ReadRegister(4);
-		gSynchConsole->Write(&ch, 1);
-		IncreasePC();
-		break;
-	}
-
-	case SC_ReadChar:
-	{
-		int maxBytes = 255;
-		char* buffer = new char[255];
-		int numBytes = gSynchConsole->Read(buffer, maxBytes);
-
-		if(numBytes > 1) {
-			printf("Chi duoc nhap duy nhat 1 ky tu!\n");
-			DEBUG('a', "\nERROR: Chi duoc nhap duy nhat 1 ky tu!");
-			machine->WriteRegister(2, 0);
-		}
-		else if(numBytes == 0) {
-			printf("Ky tu rong!\n");
-			DEBUG('a', "\nERROR: Ky tu rong!");
-			machine->WriteRegister(2, 0);
-		}
-		else {
-			char c = buffer[0];
-			machine->WriteRegister(2, c);
-		}
-		delete buffer;
-		IncreasePC();
-		
-		break;		
-	}
-=======
->>>>>>> b838424c054cac13992dd2ae1f2b26bf9f7e218d
         
 
         default:
