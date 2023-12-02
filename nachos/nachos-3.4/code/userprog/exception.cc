@@ -151,29 +151,129 @@ void ExceptionHandler(ExceptionType which)
             break;
         }
 
-	case SC_ReadString:
+	    case SC_ReadString:
         {
             int Address;
-	    int length;
-	    char* buffer;
+	        int length;
+	        char* buffer;
 
-	    Address = machine->ReadRegister(4); //lấy địa chỉ vùng nhớ ở userspace sẽ lưu chuỗi ở console
-	    length = machine->ReadRegister(5);  //lấy độ dài tối đa của chuỗi
+	        Address = machine->ReadRegister(4); //lấy địa chỉ vùng nhớ ở userspace sẽ lưu chuỗi ở console
+	        length = machine->ReadRegister(5);  //lấy độ dài tối đa của chuỗi
 
-	    buffer = User2System(Address, length); //copy chuỗi từ userspace sang kernel	    
-	    gSynchConsole->Read(buffer, length); //đọc chuỗi từ userspace với độ dài tối đa
-	    int truelength = 0;
-	    while (buffer[truelength] != '\0') //đếm độ dài thật sự của chuỗi
-            {
-                truelength++;
-            }
-	    System2User(Address, truelength, buffer); //copy chuỗi từ vùng nhớ kernel sang userspace
-	    delete[] buffer;  //giải phóng vùng nhớ
-	    IncreasePC();  //tăng program counter
+	        buffer = User2System(Address, length); //copy chuỗi từ userspace sang kernel	    
+	        gSynchConsole->Read(buffer, length); //đọc chuỗi từ userspace với độ dài tối đa
+	        int truelength = 0;
+	        while (buffer[truelength] != '\0') //đếm độ dài thật sự của chuỗi
+                {
+                    truelength++;
+                }
+	        System2User(Address, truelength, buffer); //copy chuỗi từ vùng nhớ kernel sang userspace
+	        delete[] buffer;  //giải phóng vùng nhớ
+	        IncreasePC();  //tăng program counter
 
-	    break;
+	        break;
         }
         
+        case SC_PrintInt:
+        {
+            //// đọc từ thanh ghi
+            //int number = machine->ReadRegister(4); //đọc địa chỉ bắt đầu của vùng nhớ chứa chuỗi sẽ in
+            //char* buffer = NULL;
+            //
+            //
+            //// length
+            //int length = 0;
+            //int temp = number;
+            //do {
+            //    temp /= 10;
+            //    length++;
+            //} while (temp > 0);
+
+
+            //// fix negative
+            //int end = 0;
+            //if (number > 0)
+            //{
+            //    number *= -1;
+            //    buffer = new char[length + 1];
+            //}
+            //else
+            //{
+            //    buffer = new char[length + 1 + 1];
+            //    buffer[0] = '-';
+            //    end = 1;
+            //}
+
+
+            //// chuyển số thành chuỗi
+            //temp = number;
+            //int i = length - 1;
+            //do {
+            //    int digit = temp % 10;
+            //    temp /= 10;
+            //    buffer[i] = (digit + '0');
+            //    --i;
+            //} while (i >= end && temp > 0);
+            //buffer[length] = '\0';
+
+
+            int number = machine->ReadRegister(4);;
+            int length = 0;
+
+            if (0 == number) {
+                length = 1;
+                gSynchConsole->Write("0", 1);
+            }
+            bool isNegative = (number < 0 ? true : false);
+            if (isNegative) number *= -1;
+
+            //get length of number
+            length = 0;
+            int temp_number = number;
+            do {
+                temp_number /= 10;
+                ++length;
+            } while (temp_number > 0);
+
+            length += (isNegative ? 1 : 0);
+
+            //+1 for null-terminated, +1 for sure
+            char* buffer = new char[length + 1 + 1];
+
+            //cannot allocated because of something => error
+            if (!buffer) break;
+
+            //add '-' if number is negative
+            if (isNegative)
+            {
+                buffer[0] = '-';
+            }
+
+            //reuse temp_number as copy of number
+            temp_number = number;
+
+            //iterator
+            int i = length - 1;
+
+            //Get absolute value
+            do {
+                int digit = temp_number % 10;
+                temp_number /= 10;
+                buffer[i] = (digit + '0');
+                --i;
+            } while (i >= 0 && temp_number > 0);
+
+            //add null-terminated
+            buffer[length] = NULL;
+
+
+            // in chuỗi 
+            gSynchConsole->Write(buffer, length + 1);  
+
+            delete[] buffer; //giải phóng vùng nhớ
+            IncreasePC(); //tăng program counter
+            break;
+        }
 
         default:
             printf("Unexpected user mode exception %d %d\n", which, type);

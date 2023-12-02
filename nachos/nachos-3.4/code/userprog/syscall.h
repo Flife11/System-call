@@ -31,6 +31,8 @@
 #define SC_Yield	10
 #define SC_PrintString	11
 #define SC_ReadString	12
+#define SC_PrintInt	13
+#define SC_ReadInt	14
 
 #ifndef IN_ASM
 
@@ -132,7 +134,11 @@ void PrintString(char buffer[]);
 
 /* Read a string from console
 */
-void ReadString (char buffer[], int length);		
+void ReadString (char buffer[], int length);
+
+/* Print int to console
+ */
+void PrintInt(int number);
 
 #endif /* IN_ASM */
 
