@@ -1,4 +1,4 @@
-﻿// exception.cc
+// exception.cc
 //	Entry point into the Nachos kernel from user programs.
 //	There are two kinds of things that can cause control to
 //	transfer back to here from user code:
@@ -80,6 +80,17 @@ int System2User(int virtAddr, int len, char *buffer)
     return i;
 }
 
+
+// hàm tăng giá trị thanh ghi PC
+void IncreasePC()
+{
+	int counter = machine->ReadRegister(PCReg); //lưu giá trị thanh ghi lệnh hiện tại vào counter
+   	machine->WriteRegister(PrevPCReg, counter); //lưu giá trị counter vào thanh ghi lệnh trước đó
+    	counter = machine->ReadRegister(NextPCReg); //lưu giá trị thanh ghi tiếp theo vào counter
+    	machine->WriteRegister(PCReg, counter); //lưu giá trị counter vào thanh ghi lệnh hiện hiện tại
+   	machine->WriteRegister(NextPCReg, counter + 4); //lưu giá trị counter+4 vào thanh ghi lệnh kế tiếp
+
+}
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -104,7 +115,6 @@ int System2User(int virtAddr, int len, char *buffer)
 //----------------------------------------------------------------------
 
 
-
 void ExceptionHandler(ExceptionType which)
 {
     int type = machine->ReadRegister(2);
@@ -121,206 +131,83 @@ void ExceptionHandler(ExceptionType which)
             interrupt->Halt();
             break;
 
-        case SC_Print:
+        case SC_PrintString:
         {
             int Address;
             char *buffer;
-            Address = machine->ReadRegister(4);
-            buffer = User2System(Address, MAX_BUFFER_LENGTH);
+            Address = machine->ReadRegister(4); //đọc địa chỉ bắt đầu của vùng nhớ chứa chuỗi sẽ in
+            buffer = User2System(Address, MAX_BUFFER_LENGTH); //copy chuỗi từ vùng nhớ của userspace sang kernel
             int length;
             length = 0;
-            while (buffer[length] != '\0')
+            while (buffer[length] != '\0') //đếm độ dài thật sự của chuỗi muốn in
             {
                 length++;
             }
-            synchConsole->Write(buffer, length + 1); 
+            gSynchConsole->Write(buffer, length + 1);  //in chuỗi ra console
 
-	    delete[] buffer;
-            machine->IncreasePC();
+	    delete[] buffer; //giải phóng vùng nhớ
+            IncreasePC(); //tăng program counter
             
             break;
         }
-        case SC_Open:
+
+	case SC_ReadString:
         {
-            // thông số cần có 
-            int address = machine->ReadRegister(4); 
-            int type = machine->ReadRegister(5); 
-            char* filename = User2System(address, 32); 
+            int Address;
+	    int length;
+	    char* buffer;
 
-            // tìm vị trí trống gần nhất trong bảng mô tả file 
-            int offset = -1; // error
-            for (int i = 2; i < 15; i++)
-                if (fileSystem->openf[i] == NULL)
-                {
-                    offset = i;
-                    break;
-                }
+	    Address = machine->ReadRegister(4); //lấy địa chỉ vùng nhớ ở userspace sẽ lưu chuỗi ở console
+	    length = machine->ReadRegister(5);  //lấy độ dài tối đa của chuỗi
 
-            // error handling
-            if (offset != -1)
+	    buffer = User2System(Address, length); //copy chuỗi từ userspace sang kernel	    
+	    gSynchConsole->Read(buffer, length); //đọc chuỗi từ userspace với độ dài tối đa
+	    int truelength = 0;
+	    while (buffer[truelength] != '\0') //đếm độ dài thật sự của chuỗi
             {
-                switch (type)
-                {
-                case 0:
-                case 1:
-                    if (fileSystem->openf[offset] = fileSystem->Open(filename, type))
-                        machine->WriteRegister(2, offset);
-                    break;
-                case 2:
-                    machine->WriteRegister(2, 0);
-                    break;
-                case 3:
-                    machine->WriteRegister(2, 1);
-                    break;
-                default:
-                    break;
-                }
-                delete[] filename;
-                break;
+                truelength++;
             }
-            machine->WriteRegister(2, -1); // error 
-            delete[] filename;
-            break;
+	    System2User(Address, truelength, buffer); //copy chuỗi từ vùng nhớ kernel sang userspace
+	    delete[] buffer;  //giải phóng vùng nhớ
+	    IncreasePC();  //tăng program counter
+
+	    break;
         }
 
-        case SC_Close:
-        {
-            int id = machine->ReadRegister(4); 
-            if (id >= 0 && id <= 14) 
-            {
-                if (fileSystem->openf[id])
-                {
-                    delete fileSystem->openf[id]; 
-                    fileSystem->openf[id] = NULL; 
-                    machine->WriteRegister(2, 0);
-                    break;
-                }
-            }
-            machine->WriteRegister(2, -1);
-            break;
-        }
-        case SC_Read:
-        {
-            int virtAddr = machine->ReadRegister(4);  
-			int charcount = machine->ReadRegister(5); 
-			int id = machine->ReadRegister(6); 
-			char *buf;
-			if (id < 0 || id > 14)
-			{
-				printf("\nCan't Read to position out of domain.\n");
-				machine->WriteRegister(2, -1);
-				machine -> IncreasePC();
-				break;;
-			}
-			// Kiem tra file co ton tai khong
-			if (fileSystem->openf[id] == NULL)
-			{
-				printf("\nFile not found.\n");
-				machine->WriteRegister(2, -1);
-				machine -> IncreasePC();
-				break;
-			}
-			if (fileSystem->openf[id]->type == 3)
-			{
-				printf("\nCan't read stdout file.\n");
-				machine->WriteRegister(2, -1);
-				machine -> IncreasePC();
-				break;
-			}
-			int OldPos = fileSystem->openf[id]->getSeekPosition(); 
-			buf = User2System(virtAddr, charcount);
-			
-			if (fileSystem->openf[id]->type == 2)
-			{
-				int size = synchConsole -> Read(buf, charcount);
-				System2User(virtAddr, size, buf);
-				machine -> WriteRegister(2, size);
-				delete[] buf;
-				machine -> IncreasePC();
-				break;
-			}
-			
-			if ((fileSystem->openf[id]->Read(buf, charcount)) > 0)
-			{
-				// So byte thuc su = NewPos - OldPos
-				int NewPos = fileSystem->openf[id]->getSeekPosition();
-				System2User(virtAddr, NewPos - OldPos, buf); 
-				machine->WriteRegister(2, NewPos - OldPos);
-			}
-			else
-			{
-				machine->WriteRegister(2, -2);
-			}
-			delete[] buf;
-			machine -> IncreasePC();
-			break;
-        }
+	case SC_PrintChar:
+	{
+		char ch = (char)machine->ReadRegister(4);
+		gSynchConsole->Write(&ch, 1);
+		IncreasePC();
+		break;
+	}
 
-        case SC_Write:
-        {
-            int virtAddr = machine->ReadRegister(4);
-			int charcount = machine->ReadRegister(5);
-			int openf_id = machine->ReadRegister(6);
-            char* buffer;
+	case SC_ReadChar:
+	{
+		int maxBytes = 255;
+		char* buffer = new char[255];
+		int numBytes = gSynchConsole->Read(buffer, maxBytes);
 
-
-			if (openf_id > 14 || openf_id < 0) // `out of domain` filesys + try to write to stdin 
-			{
-                printf("\nCan't Write to the positon out of domain.\n");
-				machine->WriteRegister(2, -1);
-                machine -> IncreasePC();
-				break;
-			}
-			
-			if (fileSystem->openf[openf_id] == NULL)
-			{
-                printf("\nFile not found.\n");
-				machine->WriteRegister(2, -1);
-                machine -> IncreasePC();
-				break;
-			}
-
-			// read-only file	
-			if (fileSystem->openf[openf_id]->type == 1 || fileSystem->openf[openf_id]->type == 2)
-			{
-				printf("\nCan't modify read-only file\n");
-				machine->WriteRegister(2, -1);
-                machine -> IncreasePC();
-				break;
-			}
-
-			// write to console
-                int OldPos = fileSystem->openf[openf_id]->getSeekPosition()); // Kiem tra thanh cong thi lay vi tri OldPos
-                buffer = User2System(virtAddr, charcount);  // Copy chuoi tu vung nho User Space sang System Space voi bo dem buffer dai charcount
-                // Xet truong hop ghi file read & write (type quy uoc la 0) thi tra ve so byte thuc su
-                if (fileSystem->openf[openf_id]->type == 0)
-                {
-                    if ((fileSystem->openf[openf_id]->Write(buffer, charcount)) > 0)
-                    {
-                        // So byte thuc su = NewPos - OldPos
-                        int NewPos = fileSystem->openf[openf_id]->getSeekPosition();
-                        machine->WriteRegister(2, NewPos - OldPos);
-                        delete[] buffer;
-                        machine -> IncreasePC();
-                        break;;
-                    }
-                }
-                if (fileSystem->openf[openf_id]->type == 3) // Xet truong hop con lai ghi file stdout (type quy uoc la 3)
-                {
-                    int i = 0;
-                    while (buffer[i] != 0 && buffer[i] != '\n') // Vong lap de write den khi gap ky tu '\n'
-                    {
-                        synchConsole -> Write(buffer + i, 1); // Su dung ham Write cua lop SynchConsole 
-                        i++;
-                    }
-                    buffer[i] = '\n';
-                    synchConsole -> Write(buffer + i, 1); // Write ky tu '\n'
-                    machine->WriteRegister(2, i - 1); // Tra ve so byte thuc su write duoc
-                    delete[] buffer;
-                    machine -> IncreasePC();
-                    break;;
-			} 
-        }
+		if(numBytes > 1) {
+			printf("Chi duoc nhap duy nhat 1 ky tu!\n");
+			DEBUG('a', "\nERROR: Chi duoc nhap duy nhat 1 ky tu!");
+			machine->WriteRegister(2, 0);
+		}
+		else if(numBytes == 0) {
+			printf("Ky tu rong!\n");
+			DEBUG('a', "\nERROR: Ky tu rong!");
+			machine->WriteRegister(2, 0);
+		}
+		else {
+			char c = buffer[0];
+			machine->WriteRegister(2, c);
+		}
+		delete buffer;
+		IncreasePC();
+		
+		break;		
+	}
+        
 
         default:
             printf("Unexpected user mode exception %d %d\n", which, type);

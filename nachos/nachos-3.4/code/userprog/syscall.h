@@ -29,7 +29,11 @@
 #define SC_Close	8
 #define SC_Fork		9
 #define SC_Yield	10
-#define SC_Print	11
+#define SC_PrintString	11
+#define SC_ReadString	12
+
+#define SC_PrintChar	13
+#define SC_ReadChar	14
 
 #ifndef IN_ASM
 
@@ -96,8 +100,7 @@ void Create(char *name);
 OpenFileId Open(char *name);
 
 /* Write "size" bytes from "buffer" to the open file. */
-// void Write(char *buffer, int size, OpenFileId id);
-int Write(char *buffer, int size, OpenFileId id);
+void Write(char *buffer, int size, OpenFileId id);
 
 /* Read "size" bytes from the open file into "buffer".  
  * Return the number of bytes actually read -- if the open file isn't
@@ -128,7 +131,20 @@ void Yield();
 
 /* Print a string to console
  */
-void Print(char buffer[]);		
+void PrintString(char buffer[]);
+
+/* Read a string from console
+*/
+void ReadString (char buffer[], int length);	
+
+/* Print a char to console
+
+ */
+void PrintChar(char ch);
+
+/* Read a char from console
+*/
+char ReadChar();		
 
 #endif /* IN_ASM */
 
