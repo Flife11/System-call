@@ -173,7 +173,6 @@ void ExceptionHandler(ExceptionType which)
 
 	        break;
         }
-<<<<<<< HEAD
 
 	case SC_PrintChar:
 	{
@@ -208,8 +207,6 @@ void ExceptionHandler(ExceptionType which)
 		
 		break;		
 	}
-=======
->>>>>>> b838424c054cac13992dd2ae1f2b26bf9f7e218d
         
         case SC_PrintInt:
         {
