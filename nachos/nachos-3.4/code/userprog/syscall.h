@@ -31,12 +31,9 @@
 #define SC_Yield	10
 #define SC_PrintString	11
 #define SC_ReadString	12
-<<<<<<< HEAD
+#define SC_PrintInt	13
+#define SC_ReadInt	14
 
-#define SC_PrintChar	13
-#define SC_ReadChar	14
-=======
->>>>>>> b838424c054cac13992dd2ae1f2b26bf9f7e218d
 
 #ifndef IN_ASM
 
@@ -138,20 +135,12 @@ void PrintString(char buffer[]);
 
 /* Read a string from console
 */
-<<<<<<< HEAD
-void ReadString (char buffer[], int length);	
+void ReadString (char buffer[], int length);
 
-/* Print a char to console
-
+/* Print int to console
  */
-void PrintChar(char ch);
+void PrintInt(int number);
 
-/* Read a char from console
-*/
-char ReadChar();		
-=======
-void ReadString (char buffer[], int length);		
->>>>>>> b838424c054cac13992dd2ae1f2b26bf9f7e218d
 
 #endif /* IN_ASM */
 
