@@ -1,30 +1,69 @@
-/* sort.c
- *    Test program to sort a large number of integers.
- *
- *    Intention is to stress virtual memory system.
- *
- *    Ideally, we could read the unsorted array off of the file system,
- *	and store the result back to the file system!
- */
-
 #include "syscall.h"
+#include "copyright.h"
 
-int A[1024]; /* size of physical memory; with code, we'll run out of space!*/
+
+int compare(int a, int b, int type) {  // Type 1: Ascending. Type 2: Descending
+    if (type == 1) {
+        if (a > b) {  // Truoc > Sau thi swap
+            return 0;
+        } else
+            return 1;
+    } else {
+        if (a < b) {
+            return 0;
+        } else
+            return 1;
+    }
+}
 
 int main() {
-    int i, j, tmp;
+    int a[101]; /* size of physical memory; with code, we'll run out of space!*/
+
+    int n, type, i, j, temp;
 
     /* first initialize the array, in reverse sorted order */
-    for (i = 0; i < 1024; i++)
-        A[i] = 1024 - i;
+    // Nhap so ki tu
+    do {
+
+        PrintString("Nhap so ki so n (n <= 100)");
+        n = ReadInt();
+    } while (n > 100 || n <= 0);
+
+    // Chon loai sap xep
+    do {
+
+        PrintString("Nhap loai sap xep (1: Tang dan || 2: Giam dan)");
+        type = ReadInt();
+    } while (type != 1 || type != 2);
+
+    // Input array
+    for (i = 0; i < n; ++i) {
+        PrintString("a[");
+        PrintInt(i);
+        PrintString("] = ");
+        a[i] = ReadInt();
+    }
 
     /* then sort! */
-    for (i = 0; i < 1023; i++)
-        for (j = i; j < (1023 - i); j++)
-            if (A[j] > A[j + 1]) { /* out of order -> need to swap ! */
-                tmp = A[j];
-                A[j] = A[j + 1];
-                A[j + 1] = tmp;
+    // Bubble sort
+    for (i = 0; i < n - 1; ++i) {
+        for (j = 0; j < n - i - 1; ++j) {
+            if (!compare(a[j], a[j + 1], type)) {
+                temp = a[j];
+                a[i] = a[j + 1];
+                a[j + 1] = temp;
             }
-    Exit(A[0]); /* and then we're done -- should be 0! */
+        }
+    }
+
+    // Print result
+    PrintString("Mang da sap xep\n");
+    for (i = 0; i < n; i++) {
+        PrintInt(a[i]);
+        PrintChar(' ');
+    }
+    
+    
+    Halt();
+    Exit(a[0]); 
 }

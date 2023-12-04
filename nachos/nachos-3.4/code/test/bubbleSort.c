@@ -1,4 +1,4 @@
-#include "syscall.h";
+#include "syscall.h"
 
 int compare(int a, int b, int type) {  // Type 1: Ascending. Type 2: Descending
     if (type == 1) {
@@ -22,14 +22,13 @@ int main() {
     /* first initialize the array, in reverse sorted order */
     // Nhap so ki tu
     do {
-        n = 0;
         PrintString("Nhap so ki so n (n <= 100)");
         n = ReadInt();
     } while (n > 100 || n <= 0);
 
     // Chon loai sap xep
     do {
-        type = 0;
+
         PrintString("Nhap loai sap xep (1: Tang dan || 2: Giam dan)");
         type = ReadInt();
     } while (type != 1 || type != 2);
