@@ -31,7 +31,7 @@ int main() {
 
         PrintString("Nhap loai sap xep (1: Tang dan || 2: Giam dan) ");
         type = ReadInt();
-
+PrintInt(type);
     } while (type != 1 && type != 2);
 
     // Input array
@@ -42,17 +42,17 @@ int main() {
         a[i] = ReadInt();
     }
 
-   
+    /* then sort! */
     // Bubble sort
-    for (i = 0; i < n - 1; ++i) {
+    /*for (i = 0; i < n - 1; ++i) {
         for (j = 0; j < n - i - 1; ++j) {
             if (!compare(a[j], a[j + 1], type)) {
                 temp = a[j];
-                a[j] = a[j + 1];
+                a[i] = a[j + 1];
                 a[j + 1] = temp;
             }
         }
-    }
+    }*/
 
     // Print result
     PrintString("Mang da sap xep\n");
