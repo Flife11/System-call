@@ -5,7 +5,6 @@
 int main(){
 
     PrintString("buffer\n");
-
     Halt();
     return 0;
 }
