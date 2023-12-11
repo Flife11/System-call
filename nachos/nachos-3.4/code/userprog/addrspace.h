@@ -23,6 +23,7 @@ class AddrSpace {
     AddrSpace(OpenFile *executable);	// Create an address space,
 					// initializing it with the program
 					// stored in the file "executable"
+	AddrSpace(char * filename); //custom constructor
     ~AddrSpace();			// De-allocate an address space
 
     void InitRegisters();		// Initialize user-level CPU registers,
@@ -30,6 +31,7 @@ class AddrSpace {
 
     void SaveState();			// Save/restore address space-specific
     void RestoreState();		// info on a context switch 
+	bool usedPhyPage[NumPhysPages];
 
   private:
     TranslationEntry *pageTable;	// Assume linear page table translation
