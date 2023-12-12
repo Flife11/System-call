@@ -53,7 +53,7 @@
 
 // Size of the thread's private execution stack.
 // WATCH OUT IF THIS ISN'T BIG ENOUGH!!!!!
-#define StackSize	(4 * 1024)	// in words
+#define StackSize	(4 * 16384)	// in words
 
 
 // Thread state
@@ -88,6 +88,9 @@ class Thread {
 					// is called
 
     // basic thread operations
+	int processID;
+	int exitStatus;
+	void FreeSpace(){ if(space != 0) delete space; }
 
     void Fork(VoidFunctionPtr func, int arg); 	// Make thread run (*func)(arg)
     void Yield();  				// Relinquish the CPU if any 
