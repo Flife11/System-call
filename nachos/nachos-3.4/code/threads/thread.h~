@@ -53,7 +53,7 @@
 
 // Size of the thread's private execution stack.
 // WATCH OUT IF THIS ISN'T BIG ENOUGH!!!!!
-#define StackSize	(4 * 1024)	// in words
+#define StackSize	(4 * 16384)	// in words
 
 
 // Thread state

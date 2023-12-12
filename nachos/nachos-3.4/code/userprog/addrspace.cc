@@ -166,8 +166,6 @@ AddrSpace::AddrSpace(char* filename)
 
     int numclear = gPhysPageBitMap->NumClear();
 
-    printf("\n\nSize: %d | numPages: %d | PageSize: %d | Numclear: %d\n\n", size, numPages, PageSize, numclear);  
-
     if(numPages > numclear)
     {
 	    printf("\nAddrSpace::Load : not enough memory for new process");
