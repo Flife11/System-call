@@ -6,7 +6,6 @@
 
 PTable::PTable(int size)
 {
-
     if (size < 0)
         return;
 
@@ -45,8 +44,8 @@ int PTable::ExecUpdate(char* name)
 	bmsem->P();
 	
 	// Đảm bảo thread không thực hiện chính nó
-	if(strcmp(name,currentThread->getName()) == 0 ||  strcmp(name,"./test/scheduler") == 0)
-	{
+	if(strcmp(name, currentThread->getName()) == 0 ||  strcmp(name,"./test/scheduler") == 0)
+	{ 
 		printf("\tCouldnt execute program, thread cant run itself.\n");		
 		bmsem->V();
 		return -1;
@@ -59,10 +58,10 @@ int PTable::ExecUpdate(char* name)
 		return -1;
 	}
 	// Tìm slot trống trong bảng Ptable.
-	int index = this->GetFreeSlot();
+	int freeSlotIndex = this->GetFreeSlot();
 
     // Kiểm có slot trống hay không
-	if(index < 0)
+	if(freeSlotIndex < 0)
 	{
 		printf("\tNo free slot found.\n");
 		bmsem->V();
@@ -70,15 +69,15 @@ int PTable::ExecUpdate(char* name)
 	}
 
 	// Nếu có slot trống thì tạo một PCB mới với processID chính là index của slot này
-	pcb[index] = new PCB(index);
-	pcb[index]->SetFileName(name);
+	pcb[freeSlotIndex] = new PCB(freeSlotIndex);
+	pcb[freeSlotIndex]->SetFileName(name);
 
 	// parrentID là processID của currentThread
-    	pcb[index]->parentID = currentThread->processID;
+    	pcb[freeSlotIndex]->parentID = currentThread->processID;
 
 	
 	//Gọi exec
-	int pid = pcb[index]->Exec(name,index);
+	int pid = pcb[freeSlotIndex]->Exec(name, freeSlotIndex);
 
 	bmsem->V();
 	

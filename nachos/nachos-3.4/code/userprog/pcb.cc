@@ -101,14 +101,15 @@ int PCB::Exec(char* filename, int id)
 
 	if(this->thread == NULL){
 		printf("\tError PCB Exec: Not enough memory!");
-        	multex->V();
+		multex->V();
 		return -1;
 	}
 
 	this->thread->processID = id;
 	// Đặt parrentID của thread này là processID của thread gọi thực thi Exec
 	this->parentID = currentThread->processID;
- 	this->thread->Fork(StartProcess_2,id);
+ 	this->thread->Fork(StartProcess_2, id);
+	
 	multex->V();
 
 	return id;
