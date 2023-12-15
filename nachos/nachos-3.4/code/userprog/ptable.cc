@@ -41,39 +41,35 @@ PTable::~PTable()
 
 int PTable::ExecUpdate(char* name)
 {
-
-
-        //Gọi mutex->P(); để giúp tránh tình trạng nạp 2 tiến trình cùng 1 lúc.
+	//Gọi mutex->P();tránh nạp 2 tiến trình cùng 1 lúc.
 	bmsem->P();
 	
-	// Kiểm tra tính hợp lệ của chương trình “name”.
-        // Kiểm tra sự tồn tại của chương trình “name” bằng cách gọi phương thức Open của lớp fileSystem.
+	// Đảm bảo thread không thực hiện chính nó
+	if(strcmp(name,currentThread->getName()) == 0 ||  strcmp(name,"./test/scheduler") == 0)
+	{
+		printf("\tCouldnt execute program, thread cant run itself.\n");		
+		bmsem->V();
+		return -1;
+	}
+	// Kiểm tra tồn tại chương trình tên name, nếu không có thì báo lỗi, trả về -1
 	if(name == NULL)
 	{
-		printf("\nPTable::Exec : Can't not execute name is NULL.\n");
+		printf("\tCouldnt execute program, name is NULL.\n");
 		bmsem->V();
 		return -1;
 	}
-	// So sánh tên chương trình và tên của currentThread để chắc chắn rằng chương trình này không gọi thực thi chính nó.
-	if( strcmp(name,"./test/scheduler") == 0 || strcmp(name,currentThread->getName()) == 0 )
-	{
-		printf("\nPTable::Exec : Can't not execute itself.\n");		
-		bmsem->V();
-		return -1;
-	}
-
 	// Tìm slot trống trong bảng Ptable.
 	int index = this->GetFreeSlot();
 
-    // Check if have free slot
+    // Kiểm có slot trống hay không
 	if(index < 0)
 	{
-		printf("\nPTable::Exec :There is no free slot.\n");
+		printf("\tNo free slot found.\n");
 		bmsem->V();
 		return -1;
 	}
 
-	//Nếu có slot trống thì khởi tạo một PCB mới với processID chính là index của slot này
+	// Nếu có slot trống thì tạo một PCB mới với processID chính là index của slot này
 	pcb[index] = new PCB(index);
 	pcb[index]->SetFileName(name);
 
@@ -81,46 +77,40 @@ int PTable::ExecUpdate(char* name)
     	pcb[index]->parentID = currentThread->processID;
 
 	
-	// Gọi thực thi phương thức Exec của lớp PCB.
+	//Gọi exec
 	int pid = pcb[index]->Exec(name,index);
 
-	// Gọi bmsem->V()
 	bmsem->V();
-	// Trả về kết quả thực thi của PCB->Exec.
+	
 	return pid;
 }
 
 int PTable::JoinUpdate(int id)
 {
-	// Ta kiểm tra tính hợp lệ của processID id và kiểm tra tiến trình gọi Join có phải là cha của tiến trình
-	// có processID là id hay không. Nếu không thỏa, ta báo lỗi hợp lý và trả về -1.
+	// Kiểm tra xem tiến trình gọi join có phải là cha của tiến trình processID là id hay không
 	if(id < 0)
 	{
-		printf("\nPTable::JoinUpdate : id = %d", id);
+		printf("\t Error JoinUpdate: id = %d", id);
 		return -1;
 	}
-	// Check if process running is parent process of process which joins
+	// Kiểm tra cha của process join có phải process của current thread không
 	if(currentThread->processID != pcb[id]->parentID)
 	{
-		printf("\nPTable::JoinUpdate Can't join in process which is not it's parent process.\n");
+		printf("\tError JoinUpdate: Couldnt join process to its parent.\n");
 		return -1;
 	}
 
-    	// Tăng numwait và gọi JoinWait() để chờ tiến trình con thực hiện.
+    // Tăng numwait và gọi JoinWait() để chờ tiến trình con thực hiện.
 	// Sau khi tiến trình con thực hiện xong, tiến trình đã được giải phóng
 	pcb[pcb[id]->parentID]->IncNumWait();
 	
-
-	//pcb[id]->boolBG = 1;
 	
 	pcb[id]->JoinWait();
 
-	// Xử lý exitcode.	
 	int ec = pcb[id]->GetExitCode();
-        // ExitRelease() để cho phép tiến trình con thoát.
+	// Tiến trình con thoát
 	pcb[id]->ExitRelease();
 
-    // Successfully
 	return ec;
 }
 int PTable::ExitUpdate(int exitcode)
@@ -129,7 +119,7 @@ int PTable::ExitUpdate(int exitcode)
 	int id = currentThread->processID;
 	if(id == 0)
 	{
-		
+		// giải phóng bộ nhớ
 		currentThread->FreeSpace();		
 		interrupt->Halt();
 		return 0;
@@ -137,22 +127,17 @@ int PTable::ExitUpdate(int exitcode)
     
         if(IsExist(id) == false)
 	{
-		printf("\nPTable::ExitUpdate: This %d is not exist. Try again?", id);
+		printf("\tError ExitUpdate: This id: %d does not exist", id);
 		return -1;
 	}
-
-	
-
-
 	
 	// Ngược lại gọi SetExitCode để đặt exitcode cho tiến trình gọi.
 	pcb[id]->SetExitCode(exitcode);
 	pcb[pcb[id]->parentID]->DecNumWait();
     
-    // Gọi JoinRelease để giải phóng tiến trình cha đang đợi nó(nếu có) và ExitWait() để xin tiến trình cha
-    // cho phép thoát.
+    // Giải phóng tiến trình cha đang đợi nó (nếu có)
 	pcb[id]->JoinRelease();
-    // 
+    // ExitWait() để xin tiến trình cha cho phép thoát
 	pcb[id]->ExitWait();
 	
 	Remove(id);
