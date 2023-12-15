@@ -62,7 +62,8 @@ void PCB::JoinRelease()
 // Waiting for ExitRelease to continue exec
 void PCB::ExitWait()
 { 
-	// Gọi exitsem-->P() để tiến trình chuyển sang trạng thái block và ngừng lại, chờ ExitReleaseđể thực hiện tiếp.
+	// Gọi exitsem-->P() để tiến trình chuyển sang trạng thái block và ngừng lại, 
+	// chờ ExitRelease để thực hiện tiếp.
     exitsem->P();
 }
 
@@ -96,24 +97,20 @@ int PCB::Exec(char* filename, int id)
     // Gọi mutex->P(); để giúp tránh tình trạng nạp 2 tiến trình cùng 1 lúc.
 	multex->P();
 
-    // Kiểm tra thread đã khởi tạo thành công chưa, nếu chưa thì báo lỗi là không đủ bộ nhớ, gọi mutex->V() và return.             
 	this->thread = new Thread(filename);
 
 	if(this->thread == NULL){
-		printf("\nPCB::Exec:: Not enough memory..!\n");
+		printf("\tError PCB Exec: Not enough memory!");
         	multex->V();
 		return -1;
 	}
 
-	//  Đặt processID của thread này là id.
 	this->thread->processID = id;
 	// Đặt parrentID của thread này là processID của thread gọi thực thi Exec
 	this->parentID = currentThread->processID;
-	// Gọi thực thi Fork(StartProcess_2,id) => Ta cast thread thành kiểu int, sau đó khi xử ký hàm StartProcess ta cast Thread về đúng kiểu của nó.
  	this->thread->Fork(StartProcess_2,id);
+	multex->V();
 
-    	multex->V();
-	// Trả về id.
 	return id;
 
 }
