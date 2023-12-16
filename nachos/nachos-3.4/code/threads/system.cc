@@ -34,7 +34,7 @@ SynchConsole* gSynchConsole;
 Semaphore *addrLock;	// semaphore
 BitMap *gPhysPageBitMap;	// quan ly cac frame
 PTable *pTab;		// quan ly bang tien trinh
-//STable *semTab;		// quan ly semaphore
+STable *semTab;		// quan ly semaphore
 #endif
 
 #ifdef NETWORK
@@ -160,7 +160,7 @@ Initialize(int argc, char **argv)
     addrLock = new Semaphore("addrLock", 1);
     gPhysPageBitMap = new BitMap(256);
     pTab = new PTable(10);
-    //semTab = new STable();
+    semTab = new STable();
 #endif
 
 #ifdef FILESYS

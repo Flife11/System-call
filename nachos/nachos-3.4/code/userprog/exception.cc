@@ -294,6 +294,32 @@ void ExceptionHandler(ExceptionType which)
             break;
         }
 
+        case SC_CreateSemaphore:
+        {
+            // Đọc địa chỉ "name" từ thanh ghi r4
+            int userSemaphoreNameAddr = machine->ReadRegister(4);
+            char* semaphoreName = User2System(userSemaphoreNameAddr, MAX_BUFFER_LENGTH);
+
+            // Đọc giá trị "semval" từ thanh ghi r5
+            int semaphoreValue = machine->ReadRegister(5);
+
+            if (semaphoreName == NULL) {
+                // Báo lỗi nếu không thể chuyển địa chỉ
+                machine->WriteRegister(2, -1);
+                delete[] semaphoreName;
+                break;
+            }
+
+            // Gọi hàm Create của lớp STable để tạo Semaphore
+            int creationResult = semTab->Create(semaphoreName);
+
+            // Lưu kết quả thực hiện vào thanh ghi r2
+            machine->WriteRegister(2, creationResult);
+            delete[] semaphoreName;
+            IncreasePC();
+            break;
+        }
+
         default:
             printf("Unexpected user mode exception %d %d\n", which, type);
             ASSERT(FALSE);
