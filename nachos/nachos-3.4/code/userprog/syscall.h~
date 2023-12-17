@@ -1,4 +1,4 @@
-﻿/* syscalls.h 
+/* syscalls.h 
  * 	Nachos system call interface.  These are Nachos kernel operations
  * 	that can be invoked from user programs, by trapping to the kernel
  *	via the "syscall" instruction.
@@ -155,10 +155,6 @@ void PrintInt(int number);
 /* Read Int from console
 */
 int ReadInt();
-
-/* create semaphore
-*/
-int CreateSemaphore(char* name, int semval);
 
 #endif /* IN_ASM */
 
