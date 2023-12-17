@@ -35,7 +35,7 @@
 #define SC_ReadChar	14
 #define SC_PrintInt	15
 #define SC_ReadInt	16
-#define SC_CreateSemaphore 17
+#define SC_CreateSemaphore	17
 
 
 #ifndef IN_ASM
