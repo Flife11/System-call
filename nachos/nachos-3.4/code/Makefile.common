@@ -47,8 +47,7 @@ THREAD_H =../threads/copyright.h\
 	../machine/interrupt.h\
 	../machine/sysdep.h\
 	../machine/stats.h\
-	../machine/timer.h\
-	../userprog/stable.h
+	../machine/timer.h
 
 THREAD_C =../threads/main.cc\
 	../threads/list.cc\
@@ -62,13 +61,12 @@ THREAD_C =../threads/main.cc\
 	../machine/interrupt.cc\
 	../machine/sysdep.cc\
 	../machine/stats.cc\
-	../machine/timer.cc\
-	../userprog/stable.cc
+	../machine/timer.cc
 
 THREAD_S = ../threads/switch.s
 
 THREAD_O =main.o list.o scheduler.o synch.o synchlist.o system.o thread.o \
-	utility.o threadtest.o interrupt.o stats.o sysdep.o timer.o stable.o
+	utility.o threadtest.o interrupt.o stats.o sysdep.o timer.o
 
 USERPROG_H = ../userprog/addrspace.h\
 	../userprog/bitmap.h\
@@ -80,7 +78,8 @@ USERPROG_H = ../userprog/addrspace.h\
 	../machine/translate.h\
 	../threads/synchcons.h\
 	../userprog/ptable.h\
-	../userprog/pcb.h
+	../userprog/pcb.h\
+	../userprog/stable.h
 
 USERPROG_C = ../userprog/addrspace.cc\
 	../userprog/bitmap.cc\
@@ -92,10 +91,11 @@ USERPROG_C = ../userprog/addrspace.cc\
 	../machine/translate.cc\
 	../threads/synchcons.cc\
 	../userprog/ptable.cc\
-	../userprog/pcb.cc
+	../userprog/pcb.cc\
+	../userprog/stable.cc
 
 USERPROG_O = addrspace.o bitmap.o exception.o progtest.o console.o machine.o \
-	mipssim.o translate.o synchcons.o ptable.o pcb.o
+	mipssim.o translate.o synchcons.o ptable.o pcb.o stable.o
 
 VM_H = 
 VM_C = 
