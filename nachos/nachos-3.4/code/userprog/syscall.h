@@ -36,6 +36,8 @@
 #define SC_PrintInt	15
 #define SC_ReadInt	16
 #define SC_CreateSemaphore	17
+#define SC_Up	18
+#define SC_Down	19
 
 
 #ifndef IN_ASM
@@ -156,6 +158,10 @@ void PrintInt(int number);
 */
 int ReadInt();
 int CreateSemaphore(char*name, int semval);
+
+int Up(char*name);
+
+int Down(char*name);
 #endif /* IN_ASM */
 
 #endif /* SYSCALL_H */

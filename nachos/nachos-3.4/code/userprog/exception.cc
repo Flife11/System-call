@@ -320,6 +320,51 @@ void ExceptionHandler(ExceptionType which)
             break;
         }
 
+        case SC_Up:
+        {
+            // Đọc địa chỉ "name" từ thanh ghi r4
+            int userSemaphoreNameAddr = machine->ReadRegister(4);
+            char* semaphoreName = User2System(userSemaphoreNameAddr, MAX_BUFFER_LENGTH);
+
+            if (semaphoreName == NULL) {
+                // Báo lỗi nếu không thể chuyển địa chỉ
+                machine->WriteRegister(2, -1);
+                delete[] semaphoreName;
+                break;
+            }
+
+            // Gọi hàm Signal của lớp STable để tăng giá trị Semaphore
+            int signalResult = semTab->Signal(semaphoreName);
+
+            // Lưu kết quả thực hiện vào thanh ghi r2
+            machine->WriteRegister(2, signalResult);
+            delete[] semaphoreName;
+            IncreasePC();
+            break;
+        }
+        case SC_Down:
+        {
+            // Đọc địa chỉ "name" từ thanh ghi r4
+            int userSemaphoreNameAddr = machine->ReadRegister(4);
+            char* semaphoreName = User2System(userSemaphoreNameAddr, MAX_BUFFER_LENGTH);
+
+            if (semaphoreName == NULL) {
+                // Báo lỗi nếu không thể chuyển địa chỉ
+                machine->WriteRegister(2, -1);
+                delete[] semaphoreName;
+                break;
+            }
+
+            // Gọi hàm Wait của lớp STable để giảm giá trị Semaphore
+            int waitResult = semTab->Wait(semaphoreName);
+
+            // Lưu kết quả thực hiện vào thanh ghi r2
+            machine->WriteRegister(2, waitResult);
+            delete[] semaphoreName;
+            IncreasePC();
+            break;
+        }
+
         default:
             printf("Unexpected user mode exception %d %d\n", which, type);
             ASSERT(FALSE);
