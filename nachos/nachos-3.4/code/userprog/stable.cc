@@ -14,7 +14,7 @@ STable::~STable() {
         }
     }
 }
-int STable::Create(char* name) {
+int STable::Create(char* name, int init) {
     // Kiểm tra xem tên semaphore đã tồn tại chưa
     for (int i = 0; i < MAX_SEMAPHORE; i++) {
         if (semTab[i] != NULL && strcmp(semTab[i]->GetName(), name) == 0) {
@@ -32,7 +32,7 @@ int STable::Create(char* name) {
     }
 
     // Tạo semaphore mới và đặt vào slot trống
-    semTab[freeSlot] = new Sem(name, 1);
+    semTab[freeSlot] = new Sem(name, init);
     return 0;
 }
 int STable::Wait(char* name) {
