@@ -35,7 +35,7 @@ CPP = gcc -E
 INCDIR =-I../userprog -I../threads
 CFLAGS = -G 0 -c $(INCDIR)
 
-all: halt shell matmult sort PrintString ReadString PrintChar PrintInt ascii help
+all: halt shell matmult sort PrintString ReadString PrintChar PrintInt scheduler printa printb main ascii help
 
 start.o: start.s ../userprog/syscall.h
 	$(CPP) $(CPPFLAGS) start.c > strt.s
@@ -89,6 +89,30 @@ PrintInt.o: PrintInt.c
 PrintInt: PrintInt.o start.o
 	$(LD) $(LDFLAGS) start.o PrintInt.o -o PrintInt.coff
 	../bin/coff2noff PrintInt.coff PrintInt
+
+scheduler.o: scheduler.c
+	$(CC) $(CFLAGS) -c scheduler.c
+scheduler: scheduler.o start.o
+	$(LD) $(LDFLAGS) start.o scheduler.o -o scheduler.coff
+	../bin/coff2noff scheduler.coff scheduler
+
+printa.o: printa.c
+	$(CC) $(CFLAGS) -c printa.c
+printa: printa.o start.o
+	$(LD) $(LDFLAGS) start.o printa.o -o printa.coff
+	../bin/coff2noff printa.coff printa
+
+printb.o: printb.c
+	$(CC) $(CFLAGS) -c printb.c
+printb: printb.o start.o
+	$(LD) $(LDFLAGS) start.o printb.o -o printb.coff
+	../bin/coff2noff printb.coff printb
+
+main.o: main.c
+	$(CC) $(CFLAGS) -c main.c
+main: main.o start.o
+	$(LD) $(LDFLAGS) start.o main.o -o main.coff
+	../bin/coff2noff main.coff main
 
 ascii.o: ascii.c
 	$(CC) $(CFLAGS) -c ascii.c

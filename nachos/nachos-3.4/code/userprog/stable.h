@@ -39,7 +39,7 @@ public:
 	// nhớ khởi tạo bm để sử dụng
 	STable();    
 	~STable();    
-	int Create(char* name);		// Kiểm tra Semaphore “name” chưa tồn tại thì tạo Semaphore mới. Ngược lại, báo lỗi
+	int Create(char* name, int init);		// Kiểm tra Semaphore “name” chưa tồn tại thì tạo Semaphore mới. Ngược lại, báo lỗi
 	int Wait(char* name);		// Nếu tồn tại Semaphore “name” thì gọi this->P() để thực thi. Ngược lại, báo lỗi
 	int Signal(char* name);		// Nếu tồn tại Semaphore “name” thì gọi this->V() để thực thi. Ngược lại, báo lỗi
 	int FindFreeSlot(int id);	// Tìm slot trống
